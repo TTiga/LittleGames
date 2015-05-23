@@ -83,7 +83,7 @@ Gtetrominoe_Z = {
     'blocks': (0xC600, 0x2640, 0x0C60, 0x4C80),
 }
 
-Gtetrominoes = [
+Gtetrominoes = (
     Gtetrominoe_I,
     Gtetrominoe_J,
     Gtetrominoe_L,
@@ -91,7 +91,18 @@ Gtetrominoes = [
     Gtetrominoe_S,
     Gtetrominoe_T,
     Gtetrominoe_Z
-]
+)
+
+# A simple function to choose a monospaced font. Maybe wrong :D
+def get_font():
+    if sys.platform.startswith('linux'):
+        return 'monospace'
+    elif sys.platform.startswith('win'):
+        return 'consolas'
+    elif sys.platform.startswith('os'):
+        return 'monaco'
+    else:
+        return pygame.font.get_default_font()
 
 def set_static_var(varname, value):
     def decorate(func):
@@ -110,53 +121,51 @@ def random_tetromino():
     random_index = random_tetromino.tetrominoes.pop()
     return Gtetrominoes[random_index]
 
-def map_to_each_cell(tetromino, pos, direction, map_fn, aux_data=None):
-    # map_fn must have the form --> map_fn(x, y, aux_data)
-    # where (x, y) denotes the position of a cell of tetromino
+def map_to_each_cell(tetromino, grid_pos, direction, map_fn, aux_data=None):
+    # map_fn must have the form --> map_fn(grid_x, grid_y, aux_data)
+    # where grid_x and grid_y denotes the position of a cell of tetromino
     bit   = 0x8000
     block = tetromino['blocks'][direction]
     col, row = 0, 0
-    x, y = pos
+    grid_x, grid_y = grid_pos
     while bit > 0:
         if block & bit:
-            map_fn(x+col, y+row, aux_data)
+            map_fn(grid_x+col, grid_y+row, aux_data)
         col += 1
         bit >>= 1
         if (col == 4):
             col = 0
             row += 1
 
+def grid_pos_to_cell_rect(grid_x, grid_y):
+    return (grid_x*CELL_SIZE, grid_y*CELL_SIZE, CELL_SIZE, CELL_SIZE)
+
 def draw_cell(surface, cell_rect):
     pygame.draw.rect(surface, TETROMINO_COLOR, cell_rect, 0)
     pygame.draw.rect(surface, CELL_FRAME_COLOR, cell_rect, 1)
 
-def pos_to_cell_rect(x, y):
-    return (x*CELL_SIZE, y*CELL_SIZE, CELL_SIZE, CELL_SIZE)
+def _draw_tetromino_aux(grid_x, grid_y, surface):
+    draw_cell(surface, grid_pos_to_cell_rect(grid_x, grid_y))
 
-
-def draw_tetromino(x, y, surface):
-    draw_cell(surface, pos_to_cell_rect(x, y))
-
-def pos_to_grid_pos(pos):
-    x, y = pos
-    return (int(x//CELL_SIZE), int(y//CELL_SIZE))
+def draw_tetromino(surface, grid_pos, tetromino, direction):
+    # grid_pos means the (left, top) of the 4*4 grid
+    map_to_each_cell(tetromino, grid_pos, direction, _draw_tetromino_aux, surface)
 
 # This class manages level and grade.
 class Level(object):
 
-    _top_level = 15
     _level_pos = (GAME_AREA_WIDTH + CELL_SIZE*2.5,
             NEXT_AREA_HEIGHT + CELL_SIZE*2)
     _goal_pos  = (GAME_AREA_WIDTH + CELL_SIZE*2.5,
             NEXT_AREA_HEIGHT + LEVEL_AREA_HEIGHT + CELL_SIZE*2)
     _score_pos = (GAME_AREA_WIDTH + CELL_SIZE,
             NEXT_AREA_HEIGHT + LEVEL_AREA_HEIGHT + GOAL_AREA_HEIGHT + CELL_SIZE*3)
-    _goal_needed_per_level = 4
-    _scores = (100, 300, 500, 800)      # one line, two lines, three ...
+    _top_level = 15
+    _lines_needed_per_level = 4
+    _scores = (100, 300, 500, 800)
     _init_speed = 0.6
     _fasted_speed = 0.05
     _speed_increment = (_fasted_speed-_init_speed)/float((_top_level-1))
-
 
     def __init__(self, screen):
         self._level = 1
@@ -171,15 +180,6 @@ class Level(object):
     def get_score(self):
         return self._score
 
-    def go_up(self):
-
-        self._level += 1
-        if self._level == self._top_level + 1:
-            return True
-        self._goal = self._level * self._goal_needed_per_level
-        self._speed += self._speed_increment
-        return False
-
     def add_score(self, score):
         self._score += score
 
@@ -187,16 +187,14 @@ class Level(object):
     #   and to check if the player wins.
     # score = self._scores[removed_lines-1] * (self._level*0.5 + 0.5)
     def remove_lines(self, removed_lines):
-
         score = self._scores[removed_lines-1] * (self._level*0.5 + 0.5)
         self.add_score(int(score))
         self._goal -= removed_lines
         if self._goal <= 0:
-            return self.go_up()
+            return self._level_up()
         return False
 
     def draw(self, font):
-
         level_texture = font.render(str(self._level), True, LEVEL_FONT_COLOR)
         goal_texture  = font.render(str(self._goal), True, LEVEL_FONT_COLOR)
         grade_texture = font.render(str(self._score).zfill(6), True, LEVEL_FONT_COLOR)
@@ -204,29 +202,22 @@ class Level(object):
         self._screen.blit(goal_texture, self._goal_pos)
         self._screen.blit(grade_texture, self._score_pos)
 
-# A simple function to choose a monospaced font.
-def get_font():
-    if sys.platform.startswith('linux'):
-        return 'monospace'
-    elif sys.platform.startswith('win'):
-        return 'consolas'
-    elif sys.platform.startswith('os'):
-        return 'monoca'
-    else:
-        return pygame.font.get_default_font()
+    def _level_up(self):
+        self._level += 1
+        if self._level == self._top_level + 1:
+            return True
+        self._goal = self._level * self._lines_needed_per_level
+        self._speed += self._speed_increment
+        return False
 
 # Use this class to manage tetrominoes.
 class TetrisManager(object):
 
-
     _init_moving_pos = [3, 0]
     _next_pos = [COLUMNS + 1, 2]
 
-    DIRECTION = ('left', 'right', 'down')
-
     def __init__(self, screen, font):
-
-        self._grid           = [[None]*COLUMNS for _ in xrange(ROWS)]
+        self._grid           = [ [None]*COLUMNS for _ in xrange(ROWS) ]
         self._curr_pos       = self._init_moving_pos[:]
         self._direction      = 0
         self._screen         = screen
@@ -235,7 +226,7 @@ class TetrisManager(object):
         self._next           = random_tetromino()
         self._time           = 0.0
         self._level          = Level(screen)
-        self._is_pause       = False
+        self._is_pause       = True
         self._is_win         = False
         self._is_game_over   = False
         self._pause_textures = self._get_pause_textures()
@@ -257,7 +248,6 @@ class TetrisManager(object):
 
     def game_over(self):
         self._draw_game_over_text()
-        pass
 
     def is_win(self):
         return self._is_win
@@ -266,7 +256,6 @@ class TetrisManager(object):
         self._draw_win_text()
 
     def draw_pause(self):
-
         self._screen.fill(BACKGROUND_COLOR)
         for i, texture in enumerate(self._pause_textures):
             self._screen.blit(texture, (CELL_SIZE*2, (i+2)*1.5*CELL_SIZE))
@@ -279,7 +268,7 @@ class TetrisManager(object):
         for row in xrange(ROWS):
             for col in xrange(COLUMNS):
                 if self._grid[row][col]:
-                    draw_cell(self._screen, pos_to_cell_rect(col, row))
+                    draw_cell(self._screen, grid_pos_to_cell_rect(col, row))
 
     def restart(self):
         self.__init__(self._screen, self._font)
@@ -362,15 +351,13 @@ class TetrisManager(object):
         self._level.add_score(score)
 
     def _draw_curr_tetromino(self):
-        map_to_each_cell(self._moving, self._curr_pos,
-            self._direction, draw_tetromino, self._screen)
+        draw_tetromino(self._screen, self._curr_pos, self._moving, self._direction)
 
     def _draw_next_tetromino(self):
-        map_to_each_cell(self._next, self._next_pos,
-            0, draw_tetromino, self._screen)
+        draw_tetromino(self._screen, self._next_pos, self._next, 0)
 
     def _draw_ghost_aux(self, x, y, aux_data=None):
-        pygame.draw.rect(self._screen, GHOST_COLOR, pos_to_cell_rect(x, y), 1)
+        pygame.draw.rect(self._screen, GHOST_COLOR, grid_pos_to_cell_rect(x, y), 1)
 
     def _draw_ghost(self):
         old_pos = self._curr_pos[:]
@@ -385,7 +372,6 @@ class TetrisManager(object):
             self.remove_lines()
 
     def _check_lines(self):
-
         removed_lines = 0
         row = ROWS - 1
         while row > 0:
@@ -408,7 +394,6 @@ class TetrisManager(object):
             self._is_game_over = True
 
     def _get_pause_textures(self):
-
         font = pygame.font.SysFont(get_font(), CELL_SIZE, False, False)
         textures = []
         for text in Ghelp_text:
@@ -416,7 +401,6 @@ class TetrisManager(object):
         return textures
 
     def _draw_text(self, texts, color, size):
-
         self._screen.fill(BACKGROUND_COLOR)
         font = pygame.font.SysFont(get_font(), CELL_SIZE*2, True, True)
         textures = []
@@ -443,7 +427,6 @@ class TetrisManager(object):
 #    draw_dashed_line_frame(screen)
 
 def draw_fonts(screen, font):
-
     next_texture  = font.render("Next", True, FONT_COLOR)
     level_texture = font.render("Level", True, FONT_COLOR)
     goal_texture  = font.render("Goal", True, FONT_COLOR)
@@ -460,7 +443,6 @@ def draw_fonts(screen, font):
 
 # draw a dashed line which is perpendicular to the surface.
 def draw_dashed_line(surface, color, start_pos, end_pos, dashed_len=5, width=2):
-
     if start_pos[0] == end_pos[0]:
         length = abs(end_pos[1]-start_pos[1])
         for i in range(0, length//dashed_len, 2):
@@ -480,7 +462,6 @@ def draw_dashed_line(surface, color, start_pos, end_pos, dashed_len=5, width=2):
         raise ValueError("the dashed line must be perpendicular to the surface.")
 
 def draw_dashed_line_frame(screen):
-
     draw_dashed_line(screen, DASH_LINE_COLOR,
         (GAME_AREA_WIDTH, 0),
         (GAME_AREA_WIDTH, GAME_AREA_HEIGHT))
@@ -498,7 +479,6 @@ def draw_dashed_line_frame(screen):
         (SCREEN_WIDTH, NEXT_AREA_HEIGHT + LEVEL_AREA_HEIGHT + GOAL_AREA_HEIGHT))
 
 def draw_matrices(screen):
-
     for x in xrange(CELL_SIZE, GAME_AREA_WIDTH, CELL_SIZE):
         pygame.draw.line(screen, CELL_FRAME_COLOR,
             (x, 0), (x, GAME_AREA_HEIGHT), 2)
@@ -573,7 +553,7 @@ def main():
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
     clock  = pygame.time.Clock()
     font   = pygame.font.SysFont(get_font(), int(1.3*CELL_SIZE), False, True)
-    pygame.key.set_repeat(150, 50)
+    pygame.key.set_repeat(100, 50)
     manager = TetrisManager(screen, font)
 
     while True:
@@ -582,7 +562,7 @@ def main():
         handle_events(manager)
         pygame.display.update()
 
-        if manager.is_pause():
+        if not manager.is_pause():
             if manager.is_win():
                 manager.win()
             elif manager.is_game_over():
