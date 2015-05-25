@@ -154,14 +154,14 @@ def draw_tetromino(surface, grid_pos, tetromino, direction):
 # This class manages level and grade.
 class Level(object):
 
-    _level_pos = (GAME_AREA_WIDTH + CELL_SIZE*2.5,
+    _level_pos = (GAME_AREA_WIDTH + CELL_SIZE*1.5,
             NEXT_AREA_HEIGHT + CELL_SIZE*2)
     _goal_pos  = (GAME_AREA_WIDTH + CELL_SIZE*2.5,
             NEXT_AREA_HEIGHT + LEVEL_AREA_HEIGHT + CELL_SIZE*2)
     _score_pos = (GAME_AREA_WIDTH + CELL_SIZE,
             NEXT_AREA_HEIGHT + LEVEL_AREA_HEIGHT + GOAL_AREA_HEIGHT + CELL_SIZE*3)
     _top_level = 15
-    _lines_needed_per_level = 4
+    _lines_needed_per_level = 3
     _scores = (100, 300, 500, 800)
     _init_speed = 0.6
     _fasted_speed = 0.05
@@ -169,7 +169,7 @@ class Level(object):
 
     def __init__(self, screen):
         self._level = 1
-        self._goal  = 4
+        self._goal  = 3
         self._score = 0
         self._speed = self._init_speed  # seconds needed to drop one row
         self._screen = screen
@@ -195,7 +195,8 @@ class Level(object):
         return False
 
     def draw(self, font):
-        level_texture = font.render(str(self._level), True, LEVEL_FONT_COLOR)
+        level_texture = font.render("{0}/{1}".format(
+                str(self._level), self._top_level), True, LEVEL_FONT_COLOR)
         goal_texture  = font.render(str(self._goal), True, LEVEL_FONT_COLOR)
         grade_texture = font.render(str(self._score).zfill(6), True, LEVEL_FONT_COLOR)
         self._screen.blit(level_texture, self._level_pos)
