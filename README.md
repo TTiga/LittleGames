@@ -8,5 +8,5 @@ If you want to play these games, INSTALL
 
 # Tetris
 
-![screenshot](https://raw.githubusercontent.com/TTiga/LittleGames/master/LittleGames/tetris_screenshot/tetris.PNG)
-![screenshot](https://raw.githubusercontent.com/TTiga/LittleGames/master/LittleGames/tetris_screenshot/tetris_0.PNG)
+![screenshot](https://raw.githubusercontent.com/htiga/LittleGames/master/LittleGames/tetris_screenshot/tetris.PNG)
+![screenshot](https://raw.githubusercontent.com/htiga/LittleGames/master/LittleGames/tetris_screenshot/tetris_0.PNG)
