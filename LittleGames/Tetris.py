@@ -320,9 +320,19 @@ class TetrisManager(object):
 
     def rotate(self):
         old_direction = self._direction
+        old_pos = self._curr_pos[:]
+
         self._direction = (self._direction+1) % 4
         if not self.is_unoccupied(self._curr_pos):
+
+            for i in (1, 2, -1, -2):
+                self._curr_pos[0] += i
+                if self.is_unoccupied(self._curr_pos):
+                    return
+                self._curr_pos[0] -= i
+
             self._direction = old_direction
+            self._curr_pos = old_pos
 
     def is_unoccupied(self, pos):
         result = []
