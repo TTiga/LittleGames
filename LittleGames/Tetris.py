@@ -435,7 +435,6 @@ class TetrisManager(object):
 # drae_background(screen)
 #     screen.fill(BACKGROUND_COLOR)
 #    draw_matrices(screen)
-#    draw_dashed_line_frame(screen)
 
 def draw_fonts(screen, font):
     next_texture  = font.render("Next", True, FONT_COLOR)
@@ -452,45 +451,8 @@ def draw_fonts(screen, font):
         (GAME_AREA_WIDTH + CELL_SIZE*1.5,
          CELL_SIZE/2 + LEVEL_AREA_HEIGHT + NEXT_AREA_HEIGHT))
 
-# draw a dashed line which is perpendicular to the surface.
-def draw_dashed_line(surface, color, start_pos, end_pos, dashed_len=5, width=2):
-    if start_pos[0] == end_pos[0]:
-        length = abs(end_pos[1]-start_pos[1])
-        for i in range(0, length//dashed_len, 2):
-            pygame.draw.line(surface, color,
-                (start_pos[0], start_pos[1] + dashed_len*i),
-                (start_pos[0], start_pos[1] + dashed_len*(i+1)),
-                width)
-
-    elif start_pos[1] == end_pos[1]:
-        length = abs(end_pos[0]-start_pos[0])
-        for i in range(0, length//dashed_len, 2):
-            pygame.draw.line(surface, color,
-                (start_pos[0] + dashed_len*i, start_pos[1]),
-                (start_pos[0] + dashed_len*(i+1), start_pos[1]),
-                width)
-    else:
-        raise ValueError("the dashed line must be perpendicular to the surface.")
-
-def draw_dashed_line_frame(screen):
-    draw_dashed_line(screen, DASH_LINE_COLOR,
-        (GAME_AREA_WIDTH, 0),
-        (GAME_AREA_WIDTH, GAME_AREA_HEIGHT))
-
-    draw_dashed_line(screen, DASH_LINE_COLOR,
-        (GAME_AREA_WIDTH, NEXT_AREA_HEIGHT),
-        (SCREEN_WIDTH, NEXT_AREA_HEIGHT))
-
-    draw_dashed_line(screen, DASH_LINE_COLOR,
-        (GAME_AREA_WIDTH, NEXT_AREA_HEIGHT + LEVEL_AREA_HEIGHT),
-        (SCREEN_WIDTH, NEXT_AREA_HEIGHT + LEVEL_AREA_HEIGHT))
-
-    draw_dashed_line(screen, DASH_LINE_COLOR,
-        (GAME_AREA_WIDTH, NEXT_AREA_HEIGHT + LEVEL_AREA_HEIGHT + GOAL_AREA_HEIGHT),
-        (SCREEN_WIDTH, NEXT_AREA_HEIGHT + LEVEL_AREA_HEIGHT + GOAL_AREA_HEIGHT))
-
 def draw_matrices(screen):
-    for x in xrange(CELL_SIZE, GAME_AREA_WIDTH, CELL_SIZE):
+    for x in xrange(CELL_SIZE, GAME_AREA_WIDTH + 1, CELL_SIZE):
         pygame.draw.line(screen, CELL_FRAME_COLOR,
             (x, 0), (x, GAME_AREA_HEIGHT), 2)
 
@@ -505,7 +467,6 @@ def draw_matrices(screen):
 def draw_background(screen):
     screen.fill(BACKGROUND_COLOR)
     draw_matrices(screen)
-    draw_dashed_line_frame(screen)
 
 # Handle game events
 #     Quit --> exit()
