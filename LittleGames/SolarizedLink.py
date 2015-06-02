@@ -47,7 +47,7 @@ BUTTON_RECT_SIZE    = BUTTON_RADIUS * 2
 TIMER_POS = (BUTTON_LEFT, Gbutton_start_y)
 # hints button
 HINT_COLOR         = ( 12, 199, 110)
-HINT_COUNT         = 5
+HINT_COUNT         = 6
 HINT_FONT_SIZE     = BUTTON_RADIUS
 HINT_BUTTON_RECT   = (BUTTON_LEFT, 
                        Gbutton_start_y + 3*BUTTON_RADIUS,
