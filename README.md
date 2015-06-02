@@ -8,8 +8,8 @@ If you want to play these games, INSTALL
 
 # Tetris
 
-![screenshot](https://raw.githubusercontent.com/htiga/LittleGames/master/LittleGames/tetris_screenshot/tetris.PNG)
-![screenshot](https://raw.githubusercontent.com/htiga/LittleGames/master/LittleGames/tetris_screenshot/tetris_0.PNG)
+![screenshot](https://github.com/htiga/LittleGames/blob/master/LittleGames/screenshot/tetris.png)
+![screenshot](https://github.com/htiga/LittleGames/blob/master/LittleGames/screenshot/tetris_0.png)
 
 # Solarized Link
 
