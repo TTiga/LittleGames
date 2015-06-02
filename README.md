@@ -13,4 +13,4 @@ If you want to play these games, INSTALL
 
 # Solarized Link
 
-![screenshot](https://raw.githubusercontent.com/htiga/LittleGames/master/LittleGames/tetris_screenshot/link.PNG)
+![screenshot](https://github.com/htiga/LittleGames/blob/master/LittleGames/screenshot/link.png)
