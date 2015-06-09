@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 # -*- encoding: utf-8 -*-
 
 import copy
@@ -14,7 +15,7 @@ RED    = (255,   0,   0)
 ORANGE = (255, 204,   0)
 WHITE  = (255, 255, 255)
 BLUE   = (  0,   0, 255)
- 
+
 # game configuration
 BACKGROUND_COLOR    = (253, 246, 227)
 GRID_COLOR          = ( 38, 139, 210)
@@ -49,7 +50,7 @@ TIMER_POS = (BUTTON_LEFT, Gbutton_start_y)
 HINT_COLOR         = ( 12, 199, 110)
 HINT_COUNT         = 6
 HINT_FONT_SIZE     = BUTTON_RADIUS
-HINT_BUTTON_RECT   = (BUTTON_LEFT, 
+HINT_BUTTON_RECT   = (BUTTON_LEFT,
                        Gbutton_start_y + 3*BUTTON_RADIUS,
                        BUTTON_RECT_SIZE,
                        BUTTON_RECT_SIZE)
@@ -60,7 +61,7 @@ PAUSE_RECT2         = (BUTTON_RADIUS+5,  BUTTON_RADIUS/2, 10, BUTTON_RADIUS)
 PAUSE_TRIANGLE      = [(BUTTON_RADIUS/2, BUTTON_RADIUS/2),
                        (BUTTON_RADIUS/2, BUTTON_RADIUS/2+BUTTON_RADIUS),
                        (BUTTON_RADIUS/2 + BUTTON_RADIUS, BUTTON_RADIUS)]
-PAUSE_BUTTON_RECT   = (BUTTON_LEFT, 
+PAUSE_BUTTON_RECT   = (BUTTON_LEFT,
                        Gbutton_start_y + 6*BUTTON_RADIUS,
                        BUTTON_RECT_SIZE,
                        BUTTON_RECT_SIZE)
@@ -157,7 +158,7 @@ class LinkGameButton(object):
 
     def __init__(self, rect, title_surface=None,
                  normal_surface=None,
-                 highlight_surface=None, 
+                 highlight_surface=None,
                  button_down_surface=None):
         self._rect = pygame.Rect(rect)
         # button surface:
@@ -459,7 +460,7 @@ def linked_through_two_corners(grid, grid_pos1, grid_pos2):
 
 class CricleTimer(object):
 
-    def __init__(self, seconds, radius, title_surface=None, 
+    def __init__(self, seconds, radius, title_surface=None,
                  time_over_half_color=ORANGE, time_out_color=RED):
         self._time = seconds
         self._curr_time = 0.
@@ -503,7 +504,7 @@ class CricleTimer(object):
 
     def _draw_title_surface(self, screen, x, y):
         if self._title_surface is not None:
-            screen.blit(self._title_surface, 
+            screen.blit(self._title_surface,
                         (x + self._title_x_offset, y + self._title_y_offset))
 
     def _change_color(self, color):
@@ -522,8 +523,8 @@ class CricleTimer(object):
                            (x + self._radius, y + self._radius), self._radius, 1)
         # calling pygame.draw.arc three times for anti-alias
         pygame.draw.arc(screen, color, (x, y, self._arc_len, self._arc_len),
-                        0.5*math.pi, 
-                        0.5*math.pi + self._time_ratio * self._curr_time, 
+                        0.5*math.pi,
+                        0.5*math.pi + self._time_ratio * self._curr_time,
                         self._radius)
         pygame.draw.arc(screen, color, (x, y, self._arc_len, self._arc_len),
                         0.5*math.pi + 0.01,
@@ -594,7 +595,7 @@ class PauseButton(LinkGameButton):
     def __init__(self, pause_title, not_pause_title):
         n_surf, h_surf, b_surf = self.create_default_surfaces()
         self._draw_not_pause_surface(n_surf, h_surf, b_surf)
-        super(PauseButton, self).__init__(PAUSE_BUTTON_RECT, 
+        super(PauseButton, self).__init__(PAUSE_BUTTON_RECT,
                                           not_pause_title,
                                           n_surf, h_surf, b_surf)
         self._pause = False
@@ -652,10 +653,10 @@ def draw_grid(screen, color, rows, cols, cell_size, left_top_pos=(0,0)):
 
 def draw_background(screen):
     screen.fill(BACKGROUND_COLOR)
-    draw_grid(screen, GRID_COLOR, ROWS_COUNT, 
+    draw_grid(screen, GRID_COLOR, ROWS_COUNT,
               COLS_COUNT, CELL_SIZE, (LEFT_POS, TOP_POS))
 
-def draw_rect(surface, color, grid_pos, width, 
+def draw_rect(surface, color, grid_pos, width,
               cell_size=CELL_SIZE,
               left_top=(LEFT_POS, TOP_POS)):
     left, top = left_top
@@ -663,7 +664,7 @@ def draw_rect(surface, color, grid_pos, width,
     x, y = left + c*cell_size, top + r*cell_size
     pygame.draw.rect(surface, color, (x, y, cell_size, cell_size), width)
 
-def draw_text_in_center(surface, text_surface, 
+def draw_text_in_center(surface, text_surface,
                         left_top=(LEFT_POS, TOP_POS)):
     left, top = left_top
     surf_w, surf_h = surface.get_size()
@@ -780,7 +781,7 @@ class LinkGame(object):
             result = self._get_a_couple()
             self._send_msg("No more match. Randomizing... Click <Continue> to continue")
         self._hint_pos1, self._hint_pos2 = result
-    
+
     def _time_out_handler(self, timer=None):
         self._send_msg("Game over. Restart?")
         self._game_over = True
@@ -788,7 +789,7 @@ class LinkGame(object):
     def _pause_handler(self, event):
         # when game in progress, message was removed
         if self._message is not None and not self._pause_button.is_pause():
-            self._message = None    
+            self._message = None
 
     def _restart_handler(self, event):
         self.__init__(self._screen, self._grid.rows(), self._grid.cols())
