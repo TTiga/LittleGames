@@ -218,7 +218,7 @@ class TetrisManager(object):
     _next_pos = [COLUMNS + 1, 2]
 
     def __init__(self, screen, font):
-        self._grid           = [ [None]*COLUMNS for _ in xrange(ROWS) ]
+        self._grid           = [ [None]*COLUMNS for _ in range(ROWS) ]
         self._curr_pos       = self._init_moving_pos[:]
         self._direction      = 0
         self._screen         = screen
@@ -266,8 +266,8 @@ class TetrisManager(object):
         self._draw_curr_tetromino()
         self._draw_next_tetromino()
         self._level.draw(self._font)
-        for row in xrange(ROWS):
-            for col in xrange(COLUMNS):
+        for row in range(ROWS):
+            for col in range(COLUMNS):
                 if self._grid[row][col]:
                     draw_cell(self._screen, grid_pos_to_cell_rect(col, row))
 
@@ -387,7 +387,7 @@ class TetrisManager(object):
         row = ROWS - 1
         while row > 0:
             if all(self._grid[row]):
-                for i in reversed(xrange(1, row+1)):
+                for i in reversed(range(1, row+1)):
                     self._grid[i] = self._grid[i-1][:]
                 row += 1        # check this line again since it was changed
                 removed_lines += 1
@@ -452,16 +452,16 @@ def draw_fonts(screen, font):
          CELL_SIZE/2 + LEVEL_AREA_HEIGHT + NEXT_AREA_HEIGHT))
 
 def draw_matrices(screen):
-    for x in xrange(CELL_SIZE, GAME_AREA_WIDTH + 1, CELL_SIZE):
+    for x in range(CELL_SIZE, GAME_AREA_WIDTH + 1, CELL_SIZE):
         pygame.draw.line(screen, CELL_FRAME_COLOR,
             (x, 0), (x, GAME_AREA_HEIGHT), 2)
 
-    for y in xrange(CELL_SIZE, GAME_AREA_HEIGHT, CELL_SIZE):
+    for y in range(CELL_SIZE, GAME_AREA_HEIGHT, CELL_SIZE):
         pygame.draw.line(screen, CELL_FRAME_COLOR,
             (0, y), (GAME_AREA_WIDTH, y), 2)
 
-    for y in xrange(CELL_SIZE, GAME_AREA_HEIGHT, CELL_SIZE):
-        for x in xrange(CELL_SIZE, GAME_AREA_WIDTH, CELL_SIZE):
+    for y in range(CELL_SIZE, GAME_AREA_HEIGHT, CELL_SIZE):
+        for x in range(CELL_SIZE, GAME_AREA_WIDTH, CELL_SIZE):
             pygame.draw.circle(screen, CELL_FRAME_COLOR, (x, y), 3)
 
 def draw_background(screen):
