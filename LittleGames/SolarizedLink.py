@@ -113,6 +113,7 @@ class Grid(object):
     def randomize(self):
         indices = list(self.valid_indices())
         max_index = len(indices) - 1
+        grid = self._data
         for i, pos in enumerate(indices):
             random_index = random.randint(i, max_index)
             r1, c1 = pos
