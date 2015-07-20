@@ -19,4 +19,4 @@ If you want to play these games, INSTALL
 
 This game come from [VCZH's](https://github.com/vczh) [blog](http://www.cppblog.com/vczh/archive/2008/05/03/48702.html).I rewrite it in Python.
 
-![screenshot](https://github.com/htiga/LittleGames/blob/master/LittleGames/screenshot/towerdefense.png)
+![screenshot](https://github.com/htiga/LittleGames/blob/master/LittleGames/screenshot/towerdefense.jpg)
