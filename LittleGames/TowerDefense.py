@@ -18,7 +18,8 @@ def get_length(pos1, pos2):
     x2, y2 = pos2
     return ((x2-x1)**2 + (y2-y1)**2) ** 0.5
 
-def normalize(velocity, factor=1):
+def normalize(velocity, factor=1.0):
+    factor = float(factor)
     length = get_length(velocity, (0, 0))
     velocity[0] /= (length / factor)
     velocity[1] /= (length / factor)
@@ -94,8 +95,8 @@ class RangeClip(Clip):
     def __init__(self, radius, pos, life_frames):
         Clip.__init__(self)
         self.pos = pos
-        self.life = life_frames
-        self.max_life = life_frames
+        self.max_life = float(life_frames)
+        self.life = self.max_life
         d = radius * 2
         self.rect = pygame.Rect(0, 0, d, d)
         self.rect.center = pos
@@ -122,14 +123,14 @@ class ProgressClip(Clip):
     def __init__(self, size, pos, life_frames, color):
         Clip.__init__(self)
         self.image = self._create_image(size, color)
-        self.bar_width = size * (2/3)
-        self.bar_height = size / 6
-        self.bar_pos = (size/6, size * (5/12))
+        self.bar_width = size * (2/3.)
+        self.bar_height = size / 6.
+        self.bar_pos = (size/6., size * (5/12.))
         bar_rect = (self.bar_pos, (self.bar_width, self.bar_height))
         pygame.draw.rect(self.image, color, bar_rect, 1)
 
         self.max_life = life_frames
-        self.life = 0
+        self.life = 0.
         self.pos = pos
         self.color = color
 
@@ -167,7 +168,7 @@ class Messager(Clip):
         self.life_velocity = +1
 
     def add_message(self, *messages):
-        self.msg_surfs.clear()
+        self.msg_surfs = []
         for msg in messages:
             text_surf = self.font.render(msg, False, self.color)
             self.msg_surfs.append(text_surf)
@@ -188,10 +189,10 @@ class Messager(Clip):
         height = self.font.get_height()
         if len(self.msg_surfs) > 1:
             height *= 1.2
-        y -= len(self.msg_surfs)/2 * height
+        y -= len(self.msg_surfs)/2. * height
         if self.on_center:
             for i, text_surf in enumerate(self.msg_surfs):
-                w = text_surf.get_width() / 2
+                w = text_surf.get_width() / 2.
                 text_surf.set_alpha(255 * self.life//self.max_life)
                 surface.blit(text_surf, (x - w, y + i*height))
         else:
@@ -232,11 +233,11 @@ class Monster(pygame.sprite.Sprite):
         self.tracking_towers = TowerList()
 
         self.level = level
-        self.max_life = 20 * level
+        self.max_life = 20. * level
         self.life = self.max_life
-        self.defense = (level/25) ** 2
-        self.speed = (1 + level/50) * FPS/100
-        self.speed_factor = 1
+        self.defense = (level/25.) ** 2
+        self.speed = (1 + level/50.) * FPS/100.
+        self.speed_factor = 1.
         self.money = 4 * level
         self.update_lifebar()
 
@@ -596,7 +597,7 @@ class RangeTower(Tower):
 
     def hit(self, monster):
         monster.get_hurt(self.attack_power)
-        range_clip = RangeClip(self.attack_range/2, monster.pos, FPS)
+        range_clip = RangeClip(self.attack_range/2., monster.pos, FPS)
         self.clip_painter.add_clip(range_clip)
 
 
@@ -1096,7 +1097,7 @@ class Game(object):
         x = (col-0.5) * Game.CELL_SIZE 
         y = row * Game.CELL_SIZE
         y -= self.money_font.get_height()
-        dy = -Game.CELL_SIZE/FPS / 2
+        dy = -Game.CELL_SIZE/FPS / 2.
         clip = TextClip(self.money_font, (x, y), FPS*1.5, (0, dy), text, color)
         self.clip_painter.add_clip(clip)
         return clip
