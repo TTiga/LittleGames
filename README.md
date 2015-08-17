@@ -2,9 +2,9 @@ As its name says, each Python source file contains a little game.
 
 If you want to play these games, INSTALL
     
-[Python 2.7](https://www.python.org/)
+[Python 3](https://www.python.org/downloads/)
 
-[Pygame 1.9](http://pygame.org/download.shtml)
+[Pygame 1.9](https://bitbucket.org/pygame/pygame/downloads)
 
 # Tetris
 
